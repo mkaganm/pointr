@@ -1,0 +1,61 @@
+# Go build outputs
+*.exe
+*.out
+*.test
+**/*.exe
+**/*.out
+**/*.test
+bin/
+tmp/
+**/bin/
+**/tmp/
+
+# Dependency directories
+vendor/
+**/vendor/
+
+# IDE/editor files
+.vscode/
+.idea/
+*.swp
+**/.vscode/
+**/.idea/
+**/*.swp
+
+# System files
+Thumbs.db
+.DS_Store
+**/Thumbs.db
+**/.DS_Store
+
+# Documentation
+*.docx
+**/*.docx
+
+# Log files
+*.log
+**/*.log
+
+# Others
+*.bak
+*.tmp
+**/*.bak
+**/*.tmp
+
+# Ignore server binary
+server.exe
+**/server.exe
+
+# Ignore Docker artifacts
+*.pid
+**/*.pid
+
+# Ignore coverage files
+*.cover
+coverage.out
+**/*.cover
+**/coverage.out
+
+# Ignore Makefile temp files
+*.d
+**/*.d
