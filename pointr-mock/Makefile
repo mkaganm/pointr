@@ -7,7 +7,7 @@ help: ## Show this help message
 	@echo "Pointr Mock API - Docker Commands:"
 	@echo ""
 	@echo "build              - Build Docker image"
-	@echo "run                - Run Docker container (port 8080)"
+	@echo "run                - Run Docker container (port 8081)"
 	@echo "run-port           - Run on specific port (usage: make run-port PORT=8081)"
 	@echo "dev                - Run with hot reload (development mode)"
 	@echo "stop               - Stop running container"
@@ -23,20 +23,20 @@ build: ## Build Docker image
 	docker build -t pointr-mock .
 
 # Run Docker container
-run: ## Run Docker container on port 8080
-	@echo "Running Docker container on port 8080..."
-	docker run -d --name pointr-mock-api -p 8080:8080 pointr-mock
+run: ## Run Docker container on port 8081
+	@echo "Running Docker container on port 8081..."
+	docker run -d --name pointr-mock-api -p 8081:8081 pointr-mock
 
 # Run on specific port
 run-port: ## Run Docker container on specific port (usage: make run-port PORT=8081)
 	@echo "Running Docker container on port $(PORT)..."
-	docker run -d --name pointr-mock-api-$(PORT) -p $(PORT):8080 pointr-mock
+	docker run -d --name pointr-mock-api-$(PORT) -p $(PORT):8081 pointr-mock
 
 # Run with hot reload (development)
 dev: ## Run with hot reload using Docker
 	@echo "Starting development server with hot reload..."
 	docker run -it --rm --name pointr-mock-dev \
-		-p 8080:8080 \
+		-p 8081:8081 \
 		-v $(PWD):/app \
 		-w /app \
 		golang:1.25-alpine \
@@ -68,16 +68,16 @@ clean: ## Clean Docker images and containers
 # API health check
 health: ## Check API health
 	@echo "Checking API health..."
-	curl -s http://localhost:8080/health
+	curl -s http://localhost:8081/health
 
 # Quick API test
 test-api: ## Quick API test
 	@echo "Testing API endpoints..."
 	@echo "Root endpoint:"
-	curl -s http://localhost:8080/
+	curl -s http://localhost:8081/
 	@echo ""
 	@echo "Sites:"
-	curl -s http://localhost:8080/sites
+	curl -s http://localhost:8081/sites
 	@echo ""
 	@echo "Buildings:"
-	curl -s http://localhost:8080/buildings
+	curl -s http://localhost:8081/buildings

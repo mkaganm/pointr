@@ -90,10 +90,10 @@ make test-api
 make test-api
 
 # Manuel test
-curl -s http://localhost:8080/
-curl -s http://localhost:8080/sites
-curl -s "http://localhost:8080/buildings?site_id=site-hospital-1"
-curl -s "http://localhost:8080/levels?building_id=bldg-main-1"
+curl -s http://localhost:8081/
+curl -s http://localhost:8081/sites
+curl -s "http://localhost:8081/buildings?site_id=site-hospital-1"
+curl -s "http://localhost:8081/levels?building_id=bldg-main-1"
 ```
 
 ### API Endpoint'leri
