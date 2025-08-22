@@ -1,24 +1,40 @@
-FROM jenkins/jenkins:lts
+# Jenkins LTS + JDK17 tabanı
+FROM jenkins/jenkins:lts-jdk17
 
 USER root
 
-# Install Docker CLI
-RUN curl -fsSL https://get.docker.com | sh
+# Sistem araçları
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ca-certificates curl git gnupg \
+  && rm -rf /var/lib/apt/lists/*
 
-# Add Jenkins user to the docker group
-RUN usermod -aG docker jenkins
+# Docker resmi apt reposunu ekle ve sadece CLI + compose-plugin kur
+RUN install -m 0755 -d /etc/apt/keyrings \
+  && curl -fsSL https://download.docker.com/linux/debian/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg \
+  && chmod a+r /etc/apt/keyrings/docker.gpg \
+  && . /etc/os-release \
+  && echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/debian $VERSION_CODENAME stable" \
+     > /etc/apt/sources.list.d/docker.list \
+  && apt-get update \
+  && apt-get install -y --no-install-recommends docker-ce-cli docker-compose-plugin \
+  && rm -rf /var/lib/apt/lists/*
 
-# Get the latest Docker Compose version
-RUN DOCKER_COMPOSE_VERSION=$(curl -s https://api.github.com/repos/docker/compose/releases/latest | \
-    grep -Po '"tag_name": "\K.*?(?=")') && \
-    curl -L "https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-$(uname -s)-$(uname -m)" \
-    -o /usr/local/bin/docker-compose && \
-    chmod +x /usr/local/bin/docker-compose
+# Jenkins pluginleri (Pipeline + Git + SCM’den Jenkinsfile okuma + GitHub)
+# İstediğin gibi çoğaltıp/çıkarabilirsin.
+RUN jenkins-plugin-cli --plugins \
+  workflow-aggregator \
+  workflow-scm-step \
+  pipeline-model-definition \
+  git git-client \
+  github github-branch-source
 
-USER jenkins
+# (Opsiyonel) docker grubunu oluştur; jenkins kullanıcısını bu gruba ekle
+# Not: Host'taki /var/run/docker.sock GID'i farklıysa container run aşamasında group_add vermen gerekebilir.
+RUN getent group docker || groupadd -g 999 docker \
+  && usermod -aG docker jenkins
 
-# Ortam değişkenleri
+# Setup wizard'ı geç
 ENV JAVA_OPTS="-Djenkins.install.runSetupWizard=false"
 
-# Çalışma dizini
+USER jenkins
 WORKDIR /var/jenkins_home

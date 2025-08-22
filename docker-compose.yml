@@ -1,16 +1,24 @@
+version: "3.9"
+
 services:
   jenkins:
-    image: jenkins/jenkins:lts
+    build:
+      context: ./jenkins
+      dockerfile: Dockerfile
+    image: jenkins-custom:latest
     container_name: jenkins
+    restart: always
     ports:
       - "8080:8080"
       - "50000:50000"
+    environment:
+      # Windows/Docker Desktop için: Docker daemon'a TCP ile bağlan
+      DOCKER_HOST: tcp://host.docker.internal:2375
+      # (Dockerfile zaten setup wizard'ı kapatıyor)
+      # JAVA_OPTS: "-Djenkins.install.runSetupWizard=false"
     volumes:
       - jenkins_home:/var/jenkins_home
-      - /var/run/docker.sock:/var/run/docker.sock
-    restart: unless-stopped
-    environment:
-      - JAVA_OPTS=-Djenkins.install.runSetupWizard=false
+      # Windows’ta docker.sock mount ETME (Linux'ta kullanılır)
+
 volumes:
   jenkins_home:
-    driver: local
