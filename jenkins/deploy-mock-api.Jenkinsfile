@@ -1,12 +1,30 @@
 pipeline {
   agent any
 
+  parameters {
+    // Branch adını elle girmek için serbest text parametresi
+    string(name: 'BRANCH', defaultValue: 'master', description: 'Enter the branch to build')
+  }
+
+  options {
+    skipDefaultCheckout()
+  }
+
   environment {
-    // Needed on Windows + Docker Desktop; remove if Linux host
+    // Windows + Docker Desktop için gerekebilir; Linux'ta kaldırabilirsin
     DOCKER_HOST = "tcp://host.docker.internal:2375"
   }
 
   stages {
+    stage('Checkout') {
+      steps {
+        checkout([$class: 'GitSCM',
+          branches: [[name: "*/${params.BRANCH}"]],
+          userRemoteConfigs: [[url: 'https://github.com/mkaganm/pointr.git']]
+        ])
+      }
+    }
+
     stage('Clean') {
       steps {
         sh '''
