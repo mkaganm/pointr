@@ -2,7 +2,7 @@ pipeline {
   agent any
 
   parameters {
-    // Branch adını elle girmek için serbest text parametresi
+    // Free text parameter to manually enter branch name
     string(name: 'BRANCH', defaultValue: 'master', description: 'Enter the branch to build')
   }
 
@@ -11,7 +11,7 @@ pipeline {
   }
 
   environment {
-    // Windows + Docker Desktop için gerekebilir; Linux'ta kaldırabilirsin
+    // May be required for Windows + Docker Desktop; you can remove on Linux
     DOCKER_HOST = "tcp://host.docker.internal:2375"
   }
 
