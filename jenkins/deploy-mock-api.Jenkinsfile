@@ -1,58 +1,48 @@
 pipeline {
   agent any
 
-  // Windows + Docker Desktop için; Linux'ta gerekmez.
   environment {
+    // Needed on Windows + Docker Desktop; remove if Linux host
     DOCKER_HOST = "tcp://host.docker.internal:2375"
   }
 
   stages {
-    stage('Checkout') {
-      steps { checkout scm }
+    stage('Clean') {
+      steps {
+        sh '''
+          echo "Cleaning old containers and images..."
+
+          docker rm -f pointr-mock || true
+          docker rmi -f myorg/pointr-mock:latest || true
+
+          docker image prune -f || true
+        '''
+      }
     }
 
-    stage('Build pointr-mock') {
-      when { expression { fileExists('pointr-mock/Dockerfile') } }
+    stage('Build') {
       steps {
         dir('pointr-mock') {
-          sh 'docker build -t myorg/pointr-mock:latest .'
+          sh '''
+            echo "Building Docker image..."
+            docker build \
+              -t myorg/pointr-mock:${BUILD_NUMBER} \
+              -t myorg/pointr-mock:latest \
+              .
+          '''
         }
       }
     }
 
-    stage('Deploy pointr-mock') {
-      when { expression { fileExists('pointr-mock') } }
+    stage('Deploy') {
       steps {
-        dir('pointr-mock') {
-          script {
-            if (fileExists('deploy/docker-compose.yml')) {
-              sh 'docker compose -f deploy/docker-compose.yml up -d --remove-orphans'
-            } else {
-              sh '''
-                docker rm -f pointr-mock || true
-                docker run -d --name pointr-mock -p 8081:8081 myorg/pointr-mock:latest
-              '''
-            }
-          }
-        }
-      }
-    }
-
-    stage('Build pointr-admin') {
-      when { expression { fileExists('pointr-admin/Dockerfile') } }
-      steps {
-        dir('pointr-admin') {
-          sh 'docker build -t myorg/pointr-admin:latest .'
-        }
-      }
-    }
-
-    stage('Build pointr-api') {
-      when { expression { fileExists('pointr-api/Dockerfile') } }
-      steps {
-        dir('pointr-api') {
-          sh 'docker build -t myorg/pointr-api:latest .'
-        }
+        sh '''
+          echo "Deploying container..."
+          docker run -d --name pointr-mock \
+            --restart=always \
+            -p 8081:8081 \
+            myorg/pointr-mock:${BUILD_NUMBER}
+        '''
       }
     }
   }
