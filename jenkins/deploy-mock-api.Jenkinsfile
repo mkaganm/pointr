@@ -1,8 +1,7 @@
 pipeline {
   agent any
-  options { timestamps() }
 
-  // Windows + Docker Desktop kullanıyorsan gerekli.
+  // Windows + Docker Desktop için; Linux'ta gerekmez.
   environment {
     DOCKER_HOST = "tcp://host.docker.internal:2375"
   }
@@ -22,14 +21,13 @@ pipeline {
     }
 
     stage('Deploy pointr-mock') {
-      // Deploy hep mock için; gerekirse koşul ekleyebilirsin
+      when { expression { fileExists('pointr-mock') } }
       steps {
         dir('pointr-mock') {
           script {
             if (fileExists('deploy/docker-compose.yml')) {
               sh 'docker compose -f deploy/docker-compose.yml up -d --remove-orphans'
             } else {
-              // Compose yoksa basit run (8081:8081; Jenkins 8080 ile çakışmaz)
               sh '''
                 docker rm -f pointr-mock || true
                 docker run -d --name pointr-mock -p 8081:8081 myorg/pointr-mock:latest
