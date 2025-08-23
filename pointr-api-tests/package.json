@@ -1,0 +1,16 @@
+{
+  "name": "pointr-api-tests",
+  "private": true,
+  "devDependencies": {
+    "@playwright/test": "^1.47.0",
+    "allure-playwright": "^2.13.0",
+    "allure-commandline": "^2.29.0",
+    "typescript": "^5.5.0",
+    "ts-node": "^10.9.2"
+  },
+  "scripts": {
+    "test:api": "playwright test -g \"API\"",
+    "report:allure": "allure generate --clean ./allure-results -o ./allure-report",
+    "report:open": "allure open ./allure-report"
+  }
+}
