@@ -1,0 +1,15 @@
+FROM mcr.microsoft.com/playwright:v1.47.0-jammy
+
+# Install Java for Allure
+RUN apt-get update && apt-get install -y openjdk-11-jdk && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+COPY package.json package-lock.json* ./
+RUN npm ci || npm i
+RUN npx playwright install --with-deps
+
+COPY . .
+# Allure CLI zaten package.json'da var; container'da global kurulum gerekmiyor.
+
+ENV PLAYWRIGHT_BASE_URL=http://api:8080
+CMD ["bash", "-lc", "npm run test:api && npm run report:allure && ls -la allure-report"]
