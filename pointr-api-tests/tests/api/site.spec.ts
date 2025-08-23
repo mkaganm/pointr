@@ -1,5 +1,7 @@
 import { test, expect, request } from '@playwright/test';
 import { allure } from 'allure-playwright';
+import { ApiHelpers } from '../../utils/api-helpers';
+import { TestDataFactory } from '../../data/test-data';
 
 test.describe('API | Site', () => {
   test('API | Site | create -> get -> delete [API]', async ({ baseURL }) => {
@@ -9,29 +11,29 @@ test.describe('API | Site', () => {
     // Step 1: Create a new site
     await allure.step('Step 1: Creating a new site...', async () => {
       console.log('Step 1: Creating a new site...');
-      const create = await api.post('/sites', { data: { name: 'Hospital A', location: 'Istanbul' } });
-      console.log(`Create site response status: ${create.status()}`);
-      console.log(`Expected: 201, Actual: ${create.status()}`);
-      expect(create.status()).toBe(201);
+      const siteData = TestDataFactory.createSite({ name: 'Hospital A', location: 'Istanbul' });
+      const create = await api.post('/sites', { data: siteData });
+      
+      ApiHelpers.validateApiResponse(create, 201);
       
       created = await create.json();
       console.log(`Created site ID: ${created.id}`);
       console.log(`Expected: truthy value, Actual: ${created.id}`);
       expect(created.id).toBeTruthy();
+      
+      // Verify response structure
+      ApiHelpers.verifyResponseStructure(created, ['id', 'name']);
     });
 
     // Step 2: Get the created site
     await allure.step('Step 2: Getting the created site...', async () => {
       console.log('Step 2: Getting the created site...');
-      const get = await api.get(`/sites/${created.id}`);
-      console.log(`Get site response status: ${get.status()}`);
-      console.log(`Expected: 200, Actual: ${get.status()}`);
-      expect(get.status()).toBe(200);
+      const retrievedSite = await ApiHelpers.verifySiteExists(api, created.id, {
+        name: 'Hospital A'
+      });
       
-      const got = await get.json();
-      console.log(`Retrieved site name: ${got.name}`);
-      console.log(`Expected: "Hospital A", Actual: "${got.name}"`);
-      expect(got.name).toBe('Hospital A');
+      console.log(`Retrieved site name: ${retrievedSite.name}`);
+      console.log(`Expected: "Hospital A", Actual: "${retrievedSite.name}"`);
     });
 
     // Step 3: Delete the site
@@ -46,10 +48,8 @@ test.describe('API | Site', () => {
     // Step 4: Verify site is deleted
     await allure.step('Step 4: Verifying site is deleted...', async () => {
       console.log('Step 4: Verifying site is deleted...');
-      const getMissing = await api.get(`/sites/${created.id}`);
-      console.log(`Get deleted site response status: ${getMissing.status()}`);
-      console.log(`Expected: 404, Actual: ${getMissing.status()}`);
-      expect(getMissing.status()).toBe(404);
+      await ApiHelpers.verifySiteNotExists(api, created.id);
+      console.log('Site successfully deleted and verified as non-existent');
     });
   });
 });
