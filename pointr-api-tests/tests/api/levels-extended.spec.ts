@@ -1,5 +1,7 @@
 import { test, expect, request } from '@playwright/test';
 import { allure } from 'allure-playwright';
+import { ApiHelpers } from '../../utils/api-helpers';
+import { TestDataFactory } from '../../data/test-data';
 
 test.describe('API | Levels | Extended Positive Tests', () => {
   test('API | Levels | create multiple levels with different indexes [EXTENDED]', async ({ baseURL }) => {
@@ -8,9 +10,12 @@ test.describe('API | Levels | Extended Positive Tests', () => {
     // Step 1: Create site and building
     await allure.step('Step 1: Creating site and building for multiple levels...', async () => {
       console.log('Step 1: Creating site and building for multiple levels...');
-      const site = await (await api.post('/sites', { data: { name: 'Multi Level Campus', location: 'Test City' }})).json();
+      const siteData = TestDataFactory.createRealisticSiteData();
+      const site = await (await api.post('/sites', { data: siteData })).json();
       console.log(`Created site ID: ${site.id}`);
-      const bld = await (await api.post('/buildings', { data: { site_id: site.id, name: 'Multi Level Building' }})).json();
+      
+      const buildingData = TestDataFactory.createBuilding(site.id, { name: 'Multi Level Building' });
+      const bld = await (await api.post('/buildings', { data: { site_id: site.id, name: buildingData.name, floors: buildingData.floors }})).json();
       console.log(`Created building ID: ${bld.id}`);
     });
 
@@ -18,8 +23,10 @@ test.describe('API | Levels | Extended Positive Tests', () => {
     await allure.step('Step 2: Creating multiple levels with different indexes...', async () => {
       console.log('Step 2: Creating multiple levels with different indexes...');
       
-      const site = await (await api.post('/sites', { data: { name: 'Multi Level Campus', location: 'Test City' }})).json();
-      const bld = await (await api.post('/buildings', { data: { site_id: site.id, name: 'Multi Level Building' }})).json();
+      const siteData = TestDataFactory.createSite({ name: 'Multi Level Campus', location: 'Test City' });
+      const site = await (await api.post('/sites', { data: siteData })).json();
+      const buildingData = TestDataFactory.createBuilding(site.id, { name: 'Multi Level Building' });
+      const bld = await (await api.post('/buildings', { data: { site_id: buildingData.siteId, name: buildingData.name, floors: buildingData.floors }})).json();
       
       const multi = await api.post('/levels', {
         data: {

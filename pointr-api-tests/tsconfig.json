@@ -16,6 +16,8 @@
   },
   "include": [
     "tests/**/*",
+    "utils/**/*",
+    "types/**/*",
     "playwright.config.ts"
   ],
   "exclude": [

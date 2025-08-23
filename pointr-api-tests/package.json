@@ -10,6 +10,7 @@
   },
   "scripts": {
     "test:api": "playwright test -g \"API\"",
+    "test:all": "playwright test",
     "report:allure": "allure generate --clean ./allure-results -o ./allure-report",
     "report:open": "allure open ./allure-report"
   }

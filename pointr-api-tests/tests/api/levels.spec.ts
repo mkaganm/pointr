@@ -1,18 +1,35 @@
 import { test, expect, request } from '@playwright/test';
 import { allure } from 'allure-playwright';
+import { ApiHelpers } from '../../utils/api-helpers';
+import { TestDataFactory } from '../../data/test-data';
 
 test.describe('API | Levels', () => {
-  test('API | Levels | import multiple [API]', async ({ baseURL }) => {
-    const api = await request.newContext({ baseURL });
-    let site: any;
-    let bld: any;
+  let api: any;
+  let site: any;
+  let bld: any;
+
+  test.beforeEach(async ({ baseURL }) => {
+    api = await request.newContext({ baseURL });
+  });
+
+  test('API | Levels | import multiple [API]', async () => {
 
     // Step 1: Create site and building
     await allure.step('Step 1: Creating site and building...', async () => {
       console.log('Step 1: Creating site and building...');
-      site = await (await api.post('/sites', { data: { name: 'Campus-2', location: 'Berlin' }})).json();
+      const siteData = TestDataFactory.createSite({ 
+        name: 'Campus-2', 
+        location: 'Berlin' 
+      });
+      const siteId = await ApiHelpers.createSiteAndGetId(api, siteData);
+      site = { id: siteId };
       console.log(`Created site ID: ${site.id}`);
-      bld = await (await api.post('/buildings', { data: { site_id: site.id, name: 'B-1' }})).json();
+      
+      const buildingData = TestDataFactory.createBuilding(site.id, {
+        name: 'B-1'
+      });
+      const buildingId = await ApiHelpers.createBuildingAndGetId(api, site.id, buildingData);
+      bld = { id: buildingId };
       console.log(`Created building ID: ${bld.id}`);
     });
 
@@ -73,41 +90,65 @@ test.describe('API | Levels', () => {
     });
   });
 
-  test('API | Levels | single import [API]', async ({ baseURL }) => {
-    const api = await request.newContext({ baseURL });
-    let site: any;
-    let bld: any;
+  test('API | Levels | single import [API]', async () => {
     let lv: any;
 
-    // Step 1: Create site and building
+    // Step 1: Create site and building (reuse from previous test)
     await allure.step('Step 1: Creating site and building...', async () => {
       console.log('Step 1: Creating site and building...');
-      site = await (await api.post('/sites', { data: { name: 'Campus-3', location: 'Paris' }})).json();
+      const siteData = TestDataFactory.createSite({ 
+        name: 'Campus-3', 
+        location: 'Paris' 
+      });
+      const siteId = await ApiHelpers.createSiteAndGetId(api, siteData);
+      site = { id: siteId };
       console.log(`Created site ID: ${site.id}`);
-      bld = await (await api.post('/buildings', { data: { site_id: site.id, name: 'B-2' }})).json();
+      
+      const buildingData = TestDataFactory.createBuilding(site.id, {
+        name: 'B-2'
+      });
+      const buildingId = await ApiHelpers.createBuildingAndGetId(api, site.id, buildingData);
+      bld = { id: buildingId };
       console.log(`Created building ID: ${bld.id}`);
     });
 
     // Step 2: Import single level
     await allure.step('Step 2: Importing single level...', async () => {
       console.log('Step 2: Importing single level...');
-      const single = await api.post('/levels', {
-        data: { building_id: bld.id, name: 'Basement', index: 0 }
+      
+      // For single level, API expects different format
+      const response = await api.post('/levels', { 
+        data: { 
+          building_id: bld.id, 
+          name: 'Basement', 
+          index: 0 
+        } 
       });
-      console.log(`Import single level response status: ${single.status()}`);
-      console.log(`Expected: 201, Actual: ${single.status()}`);
-      expect(single.status()).toBe(201);
-      lv = await single.json();
+      ApiHelpers.validateApiResponse(response, 201);
+      
+      lv = await response.json();
       console.log(`Created level ID: ${lv.id}`);
+      
+      // Verify response structure
+      ApiHelpers.verifyResponseStructure(lv, ['id', 'name']);
     });
 
     // Step 3: Get the level
     await allure.step('Step 3: Getting the created level...', async () => {
       console.log('Step 3: Getting the created level...');
-      const get = await api.get(`/levels/${lv.id}`);
-      console.log(`Get level response status: ${get.status()}`);
-      console.log(`Expected: 200, Actual: ${get.status()}`);
-      expect(get.status()).toBe(200);
+      const response = await api.get(`/levels/${lv.id}`);
+      ApiHelpers.validateApiResponse(response, 200);
+      
+      const level = await response.json();
+      expect(level.building_id).toBe(bld.id);
+      expect(level.name).toBe('Basement');
     });
+  });
+
+  test.afterEach(async () => {
+    // Cleanup any remaining test data
+    if (site?.id) {
+      await ApiHelpers.cleanupSite(api, site.id);
+    }
   });
 });
