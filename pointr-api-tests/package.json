@@ -11,7 +11,14 @@
   "scripts": {
     "test:api": "playwright test -g \"API\"",
     "test:all": "playwright test",
-    "report:allure": "allure generate --clean ./allure-results -o ./allure-report",
-    "report:open": "allure open ./allure-report"
+    "test:site": "playwright test -g \"Site\"",
+    "test:building": "playwright test -g \"Building\"",
+    "test:levels": "playwright test -g \"Levels\"",
+    "test:negative": "playwright test -g \"NEGATIVE\"",
+    "report:allure": "allure generate --clean ./allure-results -o ./allure-report --categories ./allure-categories.json",
+    "report:open": "allure open ./allure-report",
+    "report:serve": "allure serve ./allure-results",
+    "report:clean": "rimraf allure-results allure-report test-results playwright-report",
+    "test:with-report": "npm run test:api && npm run report:allure && npm run report:open"
   }
 }

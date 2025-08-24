@@ -27,9 +27,7 @@ services:
     ports:
       - "5050:5050"
     volumes:
-      - ./allure-report:/app/allure-results
+      - ./allure-results:/app/allure-results
     environment:
       - CHECK_RESULTS_EVERY_SECONDS=1
       - KEEP_HISTORY=1
-    depends_on:
-      - tests

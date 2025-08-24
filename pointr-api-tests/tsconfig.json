@@ -18,6 +18,7 @@
     "tests/**/*",
     "utils/**/*",
     "types/**/*",
+    "data/**/*",
     "playwright.config.ts"
   ],
   "exclude": [

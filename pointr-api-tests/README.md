@@ -1,37 +1,37 @@
 # Pointr API Tests (Playwright + Allure + Docker)
 
-## Kurulum (lokal)
+## Installation (local)
 ```bash
 npm i
 npx playwright install --with-deps
-cp env.example .env # gerekiyorsa düzenle
+cp env.example .env # edit if needed
 export PLAYWRIGHT_BASE_URL=http://localhost:8080
 npm run test:api
 npm run report:allure
 npm run report:open
 ```
 
-## Docker ile
-# API servisiniz compose içinde "api" adıyla koşuyorsa:
+## With Docker
+# If your API service runs as "api" in compose:
 ```bash
 docker compose up --build --abort-on-container-exit
 ```
 
-# Raporlar:
-# ./allure-report klasöründe oluşur
+# Reports:
+# Generated in ./allure-report folder
 
-## Notlar
+## Notes
 
-Her test kendi verisini oluşturur ve id'ler üzerinden doğrular.
+Each test creates its own data and validates through IDs.
 
-Endpoint ve şema farkı varsa testlerdeki rotaları/veri alanlarını güncelleyin.
+If there are endpoint and schema differences, update the routes/data fields in tests.
 
-## Kalite Kriterleri
-- Tüm testler **bağımsız** ve **tekrarlanabilir** olmalı.
-- Allure çıktıları `allure-results/` → `allure-report/` üretmeli.
-- Tek komutla Docker içinde koşturulmalı: `docker compose up --build`.
+## Quality Criteria
+- All tests must be **independent** and **repeatable**.
+- Allure outputs should produce `allure-results/` → `allure-report/`.
+- Should run in Docker with single command: `docker compose up --build`.
 
-## Teslim
-- Yukarıdaki dosya yapısını birebir oluştur.
-- Testler **geçer** durumda olmalı (mock varsa çalışır).
-- README'de çalıştırma adımları net olmalı.
+## Delivery
+- Create the above file structure exactly.
+- Tests should be **passing** (works if mock exists).
+- README should have clear execution steps.

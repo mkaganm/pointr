@@ -39,7 +39,7 @@ export class TestDataFactory {
       { name: 'Site-With-Dashes', location: 'Location-With-Dashes' }, // Dashes
       { name: 'Site_With_Underscores', location: 'Location_With_Underscores' }, // Underscores
       { name: 'Site123', location: 'Location123' }, // Numbers
-      { name: 'Site with Türkçe', location: 'Location with Türkçe' }, // Special characters
+      { name: 'Site with Special Chars', location: 'Location with Special Chars' }, // Special characters
       { name: 'UPPERCASE SITE', location: 'UPPERCASE LOCATION' }, // Uppercase
       { name: 'lowercase site', location: 'lowercase location' }, // Lowercase
       { name: 'MiXeD cAsE sItE', location: 'MiXeD cAsE lOcAtIoN' } // Mixed case
