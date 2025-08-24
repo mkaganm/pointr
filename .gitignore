@@ -28,10 +28,6 @@ Thumbs.db
 **/Thumbs.db
 **/.DS_Store
 
-# Documentation
-*.docx
-**/*.docx
-
 # Log files
 *.log
 **/*.log
