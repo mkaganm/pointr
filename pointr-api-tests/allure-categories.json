@@ -1,0 +1,43 @@
+[
+  {
+    "name": "Failed tests",
+    "matchedStatuses": ["failed"]
+  },
+  {
+    "name": "Broken tests",
+    "matchedStatuses": ["broken"]
+  },
+  {
+    "name": "Ignored tests",
+    "matchedStatuses": ["skipped"]
+  },
+  {
+    "name": "API Tests",
+    "messageRegex": ".*API.*"
+  },
+  {
+    "name": "Critical Tests",
+    "matchedStatuses": ["failed", "broken"],
+    "messageRegex": ".*critical.*"
+  },
+  {
+    "name": "Site Management",
+    "messageRegex": ".*Site.*"
+  },
+  {
+    "name": "Building Management", 
+    "messageRegex": ".*Building.*"
+  },
+  {
+    "name": "Level Management",
+    "messageRegex": ".*Level.*"
+  },
+  {
+    "name": "Negative Tests",
+    "messageRegex": ".*NEGATIVE.*"
+  },
+  {
+    "name": "Extended Tests",
+    "messageRegex": ".*EXTENDED.*"
+  }
+]
