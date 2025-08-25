@@ -1,6 +1,6 @@
 # POINTR
 
-A comprehensive test automation project that includes web automation tests, API tests, and CI/CD pipelines.
+A comprehensive test automation project that includes web automation tests, API tests, and CI/CD pipelines. All major components are fully dockerized for easy setup and reproducible results.
 
 ## 📁 Project Structure
 
@@ -13,13 +13,13 @@ pointr/
 └── documents/                 # Project documentation
 ```
 
-## 🚀 Components
+## �� Components
 
 ### 1. **Jenkins CI/CD** (`jenkins/`)
-- **Blog Tests**: Frontend tests with Playwright
-- **API Tests**: API endpoint tests with Allure reporting
-- **Mock API Deployment**: Automated deployment of Mock API service
-- **Port**: Jenkins UI (8080), Playwright reports (8091)
+- **Blog Tests**: Frontend tests (run in Docker)
+- **API Tests**: API endpoint tests (run in Docker)
+- **Mock API Deployment**: Automated deployment of Mock API service (run in Docker)
+- **Jenkins Server**: CI/CD pipelines managed and executed in Docker
 
 ### 2. **Mock API** (`pointr-mock/`)
 - **Technology**: Go + Fiber framework
@@ -27,18 +27,21 @@ pointr/
 - **Features**: Site, Building, Level management
 - **Endpoints**: RESTful API (GET, POST, DELETE)
 - **Database**: In-memory store
+- **Deployment**: Runs inside a Docker container
 
 ### 3. **API Tests** (`pointr-api-tests/`)
 - **Technology**: Playwright + Allure
 - **Scope**: Site, Building, Level operations
 - **Test Types**: Positive and negative test scenarios
-- **Reporting**: Allure HTML reports
+- **Reporting**: Allure HTML reports (served from Docker)
+- **Execution**: All tests run in Docker containers
 
 ### 4. **Blog Tests** (`pointr-blog-tests/`)
 - **Technology**: Playwright + TypeScript
 - **Target**: [Pointr Blog](https://www.pointr.tech/blog)
 - **Features**: Blog post analysis, word frequency
 - **Browsers**: Chrome and Firefox support
+- **Execution**: All tests run in Docker containers
 
 ## 🐳 Quick Start
 
@@ -69,12 +72,6 @@ cd jenkins
 docker build -t jenkins-pointr .
 docker run -d --name jenkins-pointr -p 8080:8080 jenkins-pointr
 ```
-
-## 📊 Reports
-
-- **Playwright**: `http://<agent-ip>:8091`
-- **Allure**: Jenkins UI → "Allure-Report"
-- **Blog Tests**: `playwright-report/` folder
 
 ## 🔧 API Endpoints
 
