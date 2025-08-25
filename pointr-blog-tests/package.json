@@ -1,0 +1,35 @@
+{
+  "name": "playwright-allure-tests",
+  "version": "1.0.0",
+  "description": "Playwright test automation with Allure reporting",
+  "main": "index.js",
+  "scripts": {
+    "test": "playwright test",
+    "test:headed": "playwright test --headed",
+    "test:ui": "playwright test --ui",
+    "test:debug": "playwright test --debug",
+    "test:parallel": "playwright test --workers=3",
+    "report": "playwright show-report",
+    "report:open": "playwright show-report",
+    "report:serve": "playwright show-report",
+    "install-browsers": "playwright install",
+    "codegen": "playwright codegen",
+    "test:smoke": "playwright test --grep @smoke",
+    "test:regression": "playwright test --grep @regression"
+  },
+  "keywords": [
+    "playwright",
+    "allure",
+    "automation",
+    "testing"
+  ],
+  "author": "Test Automation Team",
+  "license": "MIT",
+  "devDependencies": {
+    "@playwright/test": "^1.40.0",
+    "@types/node": "^24.3.0"
+  },
+  "dependencies": {
+    "dotenv": "^16.3.1"
+  }
+}
