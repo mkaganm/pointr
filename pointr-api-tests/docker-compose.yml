@@ -1,30 +1,39 @@
+# docker-compose for Playwright API tests (CI friendly)
 services:
   tests:
     build:
       context: .
       dockerfile: Dockerfile.tests
     environment:
-      # Your API base URL if needed by tests
+      # Base URL your tests call; override in CI if needed
       - PLAYWRIGHT_BASE_URL=http://host.docker.internal:8081
-      # Where Playwright Allure reporter will write raw results
+      # Where allure-playwright writes raw results (must match playwright.config.ts)
       - ALLURE_RESULTS_DIR=/app/allure-results
+      # Hint many tools we're in CI
+      - CI=1
     volumes:
-      # Bind mounts so results & report are written to the Jenkins workspace
+      # Bind mounts so Jenkins can read results and publish them
       - ./allure-results:/app/allure-results
-      - ./allure-report:/app/allure-report
       - ./playwright-report:/app/playwright-report
+    # Keep the command simple; fail-safe so CI can still publish reports
     command: >
       sh -lc "
         echo 'Running tests...' &&
-        npm run test:api || true &&
-        echo 'Generating Allure report inside container...' &&
-        npx allure generate --clean --output ./allure-report ./allure-results || true &&
-        echo 'Done.'
+        npm run test:api || npm run test:all || true &&
+        echo 'Tests finished (report will be generated on the host).'
       "
+    # Make host.docker.internal work on Linux too
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    # More stable browser runs
+    shm_size: "1gb"
+    # No networks/depends_on needed here; keep it minimal for CI
 
-  # Optional live Allure service (not required for Jenkins publishHTML)
+  # Optional: live Allure web server for local development
+  # Run with: docker compose --profile allure up allure-server
   allure-server:
     image: frankescobar/allure-docker-service
+    profiles: ["allure"]
     ports:
       - "5050:5050"
     volumes:
