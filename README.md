@@ -16,12 +16,17 @@ pointr/
 ## Components
 
 ### 1. **Jenkins CI/CD** (`jenkins/`)
+
+#### [Jenkins files and document](https://github.com/mkaganm/pointr/tree/master/jenkins)
+
 - **Blog Tests**: Frontend tests (run in Docker)
 - **API Tests**: API endpoint tests (run in Docker)
 - **Mock API Deployment**: Automated deployment of Mock API service (run in Docker)
 - **Jenkins Server**: CI/CD pipelines managed and executed in Docker
 
 ### 2. **Mock API** (`pointr-mock/`)
+
+#### [Mock API files and Document](https://github.com/mkaganm/pointr/tree/master/pointr-mock)
 - **Technology**: Go + Fiber framework
 - **Port**: 8081
 - **Features**: Site, Building, Level management
@@ -30,6 +35,7 @@ pointr/
 - **Deployment**: Runs inside a Docker container
 
 ### 3. **API Tests** (`pointr-api-tests/`)
+#### [API Tests and Document](https://github.com/mkaganm/pointr/tree/master/pointr-api-tests)
 - **Technology**: Playwright + Allure
 - **Scope**: Site, Building, Level operations
 - **Test Types**: Positive and negative test scenarios
@@ -37,6 +43,7 @@ pointr/
 - **Execution**: All tests run in Docker containers
 
 ### 4. **Blog Tests** (`pointr-blog-tests/`)
+#### [Blog Tests and Document](https://github.com/mkaganm/pointr/tree/master/pointr-blog-tests)
 - **Technology**: Playwright + TypeScript
 - **Target**: [Pointr Blog](https://www.pointr.tech/blog)
 - **Features**: Blog post analysis, word frequency
