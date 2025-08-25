@@ -47,5 +47,11 @@ pipeline {
         allowMissing: true
       ])
     }
+    // Print direct link to console
+        script {
+          def jenkinsUrl = env.JENKINS_URL ?: 'http://localhost:8080/'
+          def reportUrl = "${jenkinsUrl}job/${env.JOB_NAME}/${env.BUILD_NUMBER}/📊%20Allure%20Report/"
+          echo "📎 Allure Report URL: ${reportUrl}"
+        }
   }
 }
