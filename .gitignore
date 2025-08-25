@@ -59,3 +59,7 @@ coverage.out
 # Node modules
 node_modules/
 **/node_modules/
+
+# Test results
+**/test-results/
+test-results/
