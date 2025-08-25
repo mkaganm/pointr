@@ -1,27 +1,28 @@
-version: "3.9"
 services:
-  # Test runner service
   tests:
     build:
       context: .
       dockerfile: Dockerfile.tests
     environment:
+      # Your API base URL if needed by tests
       - PLAYWRIGHT_BASE_URL=http://host.docker.internal:8081
-    depends_on: []
+      # Where Playwright Allure reporter will write raw results
+      - ALLURE_RESULTS_DIR=/app/allure-results
     volumes:
-      - ./allure-report:/app/allure-report
+      # Bind mounts so results & report are written to the Jenkins workspace
       - ./allure-results:/app/allure-results
+      - ./allure-report:/app/allure-report
       - ./playwright-report:/app/playwright-report
     command: >
-      sh -c "
+      sh -lc "
         echo 'Running tests...' &&
-        npm run test:api &&
-        echo 'Generating Allure report...' &&
-        npx allure generate --clean &&
-        echo 'Tests completed!'
+        npm run test:api || true &&
+        echo 'Generating Allure report inside container...' &&
+        npx allure generate --clean --output ./allure-report ./allure-results || true &&
+        echo 'Done.'
       "
 
-  # Allure report server
+  # Optional live Allure service (not required for Jenkins publishHTML)
   allure-server:
     image: frankescobar/allure-docker-service
     ports:

@@ -3,10 +3,11 @@
   "private": true,
   "devDependencies": {
     "@playwright/test": "^1.47.0",
-    "allure-playwright": "^2.13.0",
+    "allure-playwright": "^2.14.0",
     "allure-commandline": "^2.29.0",
     "typescript": "^5.5.0",
-    "ts-node": "^10.9.2"
+    "ts-node": "^10.9.2",
+    "rimraf": "^6.0.1"
   },
   "scripts": {
     "test:api": "playwright test -g \"API\"",
@@ -15,9 +16,12 @@
     "test:building": "playwright test -g \"Building\"",
     "test:levels": "playwright test -g \"Levels\"",
     "test:negative": "playwright test -g \"NEGATIVE\"",
+
     "report:allure": "allure generate --clean ./allure-results -o ./allure-report --categories ./allure-categories.json",
     "report:open": "allure open ./allure-report",
     "report:serve": "allure serve ./allure-results",
+    "report:ci": "allure generate --clean ./allure-results -o ./allure-report || true",
+
     "report:clean": "rimraf allure-results allure-report test-results playwright-report",
     "test:with-report": "npm run test:api && npm run report:allure && npm run report:open"
   }
