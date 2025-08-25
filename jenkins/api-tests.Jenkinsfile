@@ -1,8 +1,6 @@
 pipeline {
   agent any
-  environment {
-    DOCKER_BUILDKIT = '1'
-  }
+  environment { DOCKER_BUILDKIT = '1' }
 
   stages {
     stage('Checkout') {
@@ -28,32 +26,21 @@ pipeline {
       }
     }
 
-    stage('Publish Allure Report') {
+    stage('Generate Allure Report') {
       steps {
         sh '''
-          echo "📊 Checking allure-report folder..."
-          test -d pointr-api-tests/allure-report || { echo "allure-report not found; creating empty dir for publisher"; mkdir -p pointr-api-tests/allure-report; }
-        '''
-      }
-    }
+          echo "📊 Generating Allure report..."
+          rm -rf pointr-api-tests/allure-report || true
+          mkdir -p pointr-api-tests/allure-report
 
-    stage('Serve on :8090') {
-      steps {
-        sh '''
-          if [ -f pointr-api-tests/allure-report/index.html ]; then
-            echo "🔎 Freeing port 8090 if in use..."
-            (command -v fuser >/dev/null 2>&1 && fuser -k 8090/tcp) \
-              || (command -v lsof >/dev/null 2>&1 && lsof -ti:8090 | xargs -r kill -9) \
-              || true
-
-            echo "🌐 Starting Python HTTP server on 8090..."
-            (python3 -V >/dev/null 2>&1 && nohup python3 -m http.server 8090 -d pointr-api-tests/allure-report >pointr-api-tests/server.log 2>&1 &) \
-              || (python  -V >/dev/null 2>&1 && nohup python  -m http.server 8090 -d pointr-api-tests/allure-report >pointr-api-tests/server.log 2>&1 &) \
-              || (cd pointr-api-tests/allure-report && nohup python3 -m http.server 8090 >../server.log 2>&1 &)
-
-            echo "📱 Open http://<agent-ip>:8090"
+          if [ -d "pointr-api-tests/allure-results" ] && [ "$(ls -A pointr-api-tests/allure-results || true)" ]; then
+            docker run --rm \
+              -v "$PWD/pointr-api-tests/allure-results:/results" \
+              -v "$PWD/pointr-api-tests/allure-report:/report" \
+              ghcr.io/allure-framework/allure2:2.29.0 \
+              generate /results -o /report
           else
-            echo "No allure-report/index.html; skipping serve."
+            echo "No allure-results found; skipping."
           fi
         '''
       }
@@ -62,11 +49,11 @@ pipeline {
 
   post {
     always {
-      archiveArtifacts artifacts: 'pointr-api-tests/allure-results/**,pointr-api-tests/allure-report/**,pointr-api-tests/server.log', fingerprint: true, allowEmptyArchive: true
+      archiveArtifacts artifacts: 'pointr-api-tests/allure-results/**,pointr-api-tests/allure-report/**', fingerprint: true, allowEmptyArchive: true
       publishHTML(target: [
         reportDir: 'pointr-api-tests/allure-report',
         reportFiles: 'index.html',
-        reportName: 'Allure Report (served on :8090)',
+        reportName: '📊 Allure Report',
         keepAll: true,
         alwaysLinkToLastBuild: true,
         allowMissing: true
