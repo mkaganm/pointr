@@ -18,7 +18,7 @@ pipeline {
       steps {
         // Run tests via docker-compose; do not fail pipeline immediately
         sh '''
-          set -euxo pipefail
+          set -eu
           echo "🚀 Starting Docker tests..."
           docker compose -f pointr-api-tests/docker-compose.yml config --services || true
           docker compose -f pointr-api-tests/docker-compose.yml up --build tests || true
@@ -60,38 +60,34 @@ pipeline {
               echo "⚠️  Could not resolve container id for tests service."
             fi
           '''
-          // Shut down compose services to clean up
+          // Always bring the stack down
           sh 'docker compose -f pointr-api-tests/docker-compose.yml down || true'
         }
-      }
-    }
-
-    stage('Generate Allure Report (host)') {
-      steps {
-        // Generate Allure report on Jenkins host using official Allure docker image
-        sh '''
-          set -e
-          echo "📊 Generating Allure report on host..."
-          rm -rf pointr-api-tests/allure-report || true
-          mkdir -p pointr-api-tests/allure-report
-
-          if [ -d "pointr-api-tests/allure-results" ] && [ "$(ls -A pointr-api-tests/allure-results || true)" ]; then
-            docker run --rm \
-              -v "$PWD/pointr-api-tests/allure-results:/results" \
-              -v "$PWD/pointr-api-tests/allure-report:/report" \
-              ghcr.io/allure-framework/allure2:2.29.0 \
-              generate /results -o /report
-            echo "✅ Allure report generated."
-          else
-            echo "❌ No allure-results found; skipping generate."
-          fi
-        '''
       }
     }
   }
 
   post {
     always {
+      // Generate Allure report on Jenkins host using official Allure docker image
+      sh '''
+        set -e
+        echo "📊 Generating Allure report on host (post stage)..."
+        rm -rf pointr-api-tests/allure-report || true
+        mkdir -p pointr-api-tests/allure-report
+
+        if [ -d "pointr-api-tests/allure-results" ] && [ "$(ls -A pointr-api-tests/allure-results || true)" ]; then
+          docker run --rm \
+            -v "$PWD/pointr-api-tests/allure-results:/results" \
+            -v "$PWD/pointr-api-tests/allure-report:/report" \
+            ghcr.io/allure-framework/allure2:2.29.0 \
+            generate /results -o /report
+          echo "✅ Allure report generated."
+        else
+          echo "❌ No allure-results found; skipping generate."
+        fi
+      '''
+
       // Archive artifacts so they are kept in Jenkins build history
       archiveArtifacts artifacts: 'pointr-api-tests/allure-results/**,pointr-api-tests/allure-report/**', fingerprint: true, allowEmptyArchive: true
 
