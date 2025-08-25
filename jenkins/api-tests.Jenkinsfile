@@ -1,16 +1,14 @@
 pipeline {
   agent any
-  options { timestamps() }
 
   environment {
-    // Enable BuildKit for faster/more reliable Docker builds (optional but recommended)
     DOCKER_BUILDKIT = '1'
   }
 
   stages {
     stage('Checkout') {
       steps {
-        // Clone the repo and show basic listing for sanity
+        // Clone the repo and list the test folder
         git url: 'https://github.com/mkaganm/pointr.git', branch: 'master'
         dir('pointr/pointr-api-tests') {
           sh 'pwd && ls -la'
@@ -29,7 +27,6 @@ pipeline {
       }
       post {
         always {
-          // Always tear down containers even if tests fail
           dir('pointr/pointr-api-tests') {
             sh 'docker compose down || true'
           }
@@ -52,16 +49,15 @@ pipeline {
       steps {
         dir('pointr/pointr-api-tests') {
           sh '''
-            echo "🔎 Checking and freeing port 8090 if in use..."
+            echo "🔎 Freeing port 8090 if in use..."
             (command -v fuser >/dev/null 2>&1 && fuser -k 8090/tcp) \
-              || (command -v lsof >/dev/null 2>&1 && lsof -ti:8090 | xargs -r kill -9) \
+              || (command -v lsof  >/dev/null 2>&1 && lsof -ti:8090 | xargs -r kill -9) \
               || true
 
             echo "🌐 Starting Python server on port 8090..."
-            # Prefer python3; fall back to python if needed
-            (python3 -V >/dev/null 2>&1 && nohup python3 -m http.server 8090 -d allure-report >/dev/null 2>&1 &) \
-              || (python -V >/dev/null 2>&1 && nohup python -m http.server 8090 -d allure-report >/dev/null 2>&1 &) \
-              || (cd allure-report && nohup python3 -m http.server 8090 >/dev/null 2>&1 &)
+            (python3 -V >/dev/null 2>&1 && nohup python3 -m http.server 8090 -d allure-report >server.log 2>&1 &) \
+              || (python  -V >/dev/null 2>&1 && nohup python  -m http.server 8090 -d allure-report >server.log 2>&1 &) \
+              || (cd allure-report && nohup python3 -m http.server 8090 >server.log 2>&1 &)
 
             echo "📱 Open http://localhost:8090 in your browser"
           '''
@@ -72,7 +68,6 @@ pipeline {
 
   post {
     always {
-      // Archive the generated report and publish as a Jenkins HTML report
       dir('pointr/pointr-api-tests') {
         archiveArtifacts artifacts: 'allure-report/**', fingerprint: true
         publishHTML(target: [
