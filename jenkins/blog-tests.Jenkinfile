@@ -1,0 +1,74 @@
+pipeline {
+  agent any
+
+  stages {
+    stage('Checkout') {
+      steps {
+        git url: 'https://github.com/mkaganm/pointr.git', branch: 'master'
+        dir('pointr-blog-tests') { sh 'pwd && ls -la' }
+      }
+    }
+
+    stage('Run Playwright via Docker') {
+      steps {
+        dir('pointr-blog-tests') {
+          sh '''
+            echo "🚀 Running Playwright tests inside Docker..."
+            docker run --rm \
+              -v "$PWD":/work \
+              -w /work \
+              --ipc=host \
+              mcr.microsoft.com/playwright:v1.47.0-jammy \
+              bash -lc "\
+                set -euo pipefail; \
+                if [ -f package-lock.json ]; then npm ci; else npm i; fi; \
+                npx playwright install --with-deps; \
+                npx playwright test --project=chromium --project=firefox --reporter=html \
+              "
+            echo "📁 Report at: $(pwd)/playwright-report"
+          '''
+        }
+      }
+    }
+
+    stage('Serve report on :8091') {
+      steps {
+        dir('pointr-blog-tests') {
+          sh '''
+            if [ -f playwright-report/index.html ]; then
+              echo "🔎 Freeing port 8091 if in use..."
+              (command -v fuser >/dev/null 2>&1 && fuser -k 8091/tcp) \
+                || (command -v lsof  >/dev/null 2>&1 && lsof -ti:8091 | xargs -r kill -9) \
+                || true
+
+              echo "🌐 Starting Python HTTP server on 8091..."
+              (python3 -V >/dev/null 2>&1 && nohup python3 -m http.server 8091 -d playwright-report >server-8091.log 2>&1 &) \
+                || (python  -V  >/dev/null 2>&1 && nohup python  -m http.server 8091 -d playwright-report >server-8091.log 2>&1 &) \
+                || (cd playwright-report && nohup python3 -m http.server 8091 >../server-8091.log 2>&1 &)
+
+              echo "📱 Open http://<agent-ip>:8091"
+            else
+              echo "No playwright-report/index.html; skipping serve."
+            fi
+          '''
+        }
+      }
+    }
+  }
+
+  post {
+    always {
+      dir('pointr-blog-tests') {
+        archiveArtifacts artifacts: 'playwright-report/**,server-8091.log', fingerprint: true, allowEmptyArchive: true
+        publishHTML(target: [
+          reportDir: 'playwright-report',
+          reportFiles: 'index.html',
+          reportName: 'Playwright Report (served on :8091)',
+          keepAll: true,
+          alwaysLinkToLastBuild: true,
+          allowMissing: true
+        ])
+      }
+    }
+  }
+}
