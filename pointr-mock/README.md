@@ -1,121 +1,137 @@
-# Pointr Mock API (Go + Fiber) — Docker Edition
+# Pointr Mock API - Project Structure
 
-Bu repo **Site / Building / Level** için mock REST API içerir. Tamamen Docker üzerinden çalışır, in-memory veri saklama kullanır ve başlangıçta seed verisi yüklenir.
+A Go-based REST API mock service for Site/Building/Level management using Docker and Fiber framework.
 
-## 🚀 Gereksinimler
+## 🏗️ Architecture Overview
 
-- **Docker** (v20.10+)
-- **Make** (Windows için: Git Bash, WSL veya Chocolatey)
-- **curl** (test için)
-
-## 📦 Özellikler
-
-- ✅ **Docker First** - Sadece Docker ile çalışır
-- ✅ **Hot Reload** - Geliştirme modunda otomatik yeniden yükleme
-- ✅ **Modüler Yapı** - Temiz kod organizasyonu
-- ✅ **REST API** - Site/Building/Level CRUD operasyonları
-- ✅ **In-Memory Storage** - Hızlı ve basit veri saklama
-- ✅ **Seed Data** - Hazır test verileri
-
-## Project Tree
 ```
-cmd/server/main.go          # app entry
-internal/domain/models.go   # domain modelleri
-internal/store/store.go     # store interface
-internal/store/memory.go    # memory implementasyonu
-internal/httpapi/handlers.go# Fiber handler'ları
-internal/httpapi/routes.go  # route tanımları
-internal/seed/seed.go       # başlangıç verileri
-Dockerfile
+pointr-mock/
+├── cmd/
+│   └── server/
+│       └── main.go              # Application entry point
+├── internal/
+│   ├── domain/
+│   │   └── models.go            # Domain models (Site, Building, Level)
+│   ├── httpapi/
+│   │   ├── handlers.go          # HTTP handlers (main handler struct)
+│   │   ├── building_handlers.go # Building-specific handlers
+│   │   ├── level_handlers.go    # Level-specific handlers
+│   │   ├── site_handlers.go     # Site-specific handlers
+│   │   └── routes.go            # Route definitions
+│   ├── seed/
+│   │   └── seed.go              # Initial data seeding
+│   └── store/
+│       ├── store.go             # Store interface definition
+│       ├── memory.go            # In-memory store implementation
+│       ├── building_store.go    # Building store operations
+│       ├── level_store.go       # Level store operations
+│       └── site_store.go        # Site store operations
+├── Dockerfile                   # Multi-stage Docker build
+├── Makefile                     # Docker-based build and run commands
+└── go.mod                       # Go module dependencies
 ```
 
-## 🐳 Docker ile Çalıştırma
+## 🎯 Key Components
 
-### Hızlı Başlangıç
+### **Domain Layer** (`internal/domain/`)
+- **models.go**: Core business entities (Site, Building, Level)
+- Defines data structures and validation rules
+
+### **Store Layer** (`internal/store/`)
+- **store.go**: Interface defining data access contracts
+- **memory.go**: In-memory implementation for rapid development
+- **{entity}_store.go**: Entity-specific CRUD operations
+- Enables easy switching between storage backends (Memory → Redis/PostgreSQL)
+
+### **HTTP API Layer** (`internal/httpapi/`)
+- **handlers.go**: Main handler struct and common utilities
+- **{entity}_handlers.go**: REST endpoint implementations
+- **routes.go**: Fiber route registration and middleware setup
+- Clean separation of concerns with dedicated handlers per entity
+
+### **Application Entry** (`cmd/server/`)
+- **main.go**: Application bootstrap, dependency injection, and server startup
+- Configures Fiber app, initializes stores, loads seed data
+
+### **Data Seeding** (`internal/seed/`)
+- **seed.go**: Pre-populates database with test data
+- Ensures consistent starting state for development and testing
+
+## 🔄 Data Flow
+
+```
+HTTP Request → Routes → Handlers → Store Interface → Memory Store → Response
+```
+
+## 🐳 Docker Integration
+
+- **Multi-stage build**: Optimized production image
+- **Port 8081**: Default application port
+- **Makefile**: Simplified Docker operations
+- **Hot reload**: Development mode with automatic restarts
+
+## 🚀 Quick Start
+
 ```bash
-# Docker image'ını build et
+# Build and run
 make build
-
-# Container'ı çalıştır
 make run
 
-# API'yi test et
+# Test API
 make test-api
-```
 
-### Geliştirme Modu (Hot Reload)
-```bash
-# Hot reload ile geliştirme
+# Development mode
 make dev
 ```
 
-### Farklı Port ile Çalıştırma
+## 📋 API Endpoints
+
+- **Sites**: `GET/POST /sites`, `GET/DELETE /sites/:id`
+- **Buildings**: `GET/POST /buildings`, `GET/DELETE /buildings/:id`
+- **Levels**: `GET/POST /levels`, `GET/DELETE /levels/:id`
+- **Health**: `GET /health`
+
+## 🧪 API Examples
+
+### Quick Test Commands
 ```bash
-# Belirli port ile çalıştırma
-make run-port PORT=8081
-```
-
-### Container Yönetimi
-```bash
-# Container'ı durdur
-make stop
-
-# Log'ları görüntüle
-make logs
-
-# Container shell'ine eriş
-make shell
-
-# Temizlik (container ve image'ı sil)
-make clean
-```
-
-### Yardımcı Komutlar
-```bash
-# Tüm komutları görme
-make help
-
-# API sağlık kontrolü
-make health
-
-# Hızlı API test
-make test-api
-```
-
-## 🧪 Hızlı Test
-
-### Docker ile Test
-```bash
-# Container çalıştıktan sonra
-make test-api
-
-# Manuel test
+# Basic API status
 curl -s http://localhost:8081/
+
+# Get all sites
 curl -s http://localhost:8081/sites
+
+# Get buildings for specific site
 curl -s "http://localhost:8081/buildings?site_id=site-hospital-1"
+
+# Get levels for specific building
 curl -s "http://localhost:8081/levels?building_id=bldg-main-1"
 ```
 
-### API Endpoint'leri
-- `GET /` - API durumu ve sayılar
-- `GET /health` - Sağlık kontrolü
-- `GET /sites` - Tüm siteler
-- `POST /sites` - Yeni site oluştur
-- `GET /sites/:id` - Site detayı
-- `DELETE /sites/:id` - Site sil
-- `GET /buildings` - Tüm binalar
-- `POST /buildings` - Yeni bina oluştur
-- `GET /buildings/:id` - Bina detayı
-- `DELETE /buildings/:id` - Bina sil
-- `GET /levels` - Tüm katlar
-- `POST /levels` - Yeni kat oluştur (tekli/toplı)
-- `GET /levels/:id` - Kat detayı
+### Complete Endpoint List
+- `GET /` - API status and statistics
+- `GET /health` - Health check
+- `GET /sites` - List all sites
+- `POST /sites` - Create new site
+- `GET /sites/:id` - Get site details
+- `DELETE /sites/:id` - Delete site
+- `GET /buildings` - List all buildings
+- `POST /buildings` - Create new building
+- `GET /buildings/:id` - Get building details
+- `DELETE /buildings/:id` - Delete building
+- `GET /levels` - List all levels
+- `POST /levels` - Create new level (single or batch)
+- `GET /levels/:id` - Get level details
 
-## Zorunlu uçlar (case)
+### Required Endpoints (Use Cases)
 - `POST /sites`, `GET /sites/:id`, `DELETE /sites/:id`
 - `POST /buildings`, `GET /buildings/:id`, `DELETE /buildings/:id`
-- `POST /levels` (tek veya `{items:[...]}`), `GET /levels/:id`
+- `POST /levels` (single or `{items:[...]}`), `GET /levels/:id`
 
-## Notlar
-- ID gönderilmezse `uuid` atanır; seed verileri sabit ID kullanır (testler için stabil). 
-- Store interface sayesinde Memory → Redis/PG geçişi kolaydır.
+## 🎨 Design Patterns
+
+- **Clean Architecture**: Separation of concerns with clear layers
+- **Interface Segregation**: Store interface enables multiple implementations
+- **Dependency Injection**: Handlers receive store dependencies
+- **Repository Pattern**: Store layer abstracts data access
+- **RESTful Design**: Standard HTTP methods and status codes

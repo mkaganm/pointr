@@ -1,136 +1,86 @@
 # Pointr Blog Test Automation Project
 
-This project is designed to test the [Pointr Blog](https://www.pointr.tech/blog) page using Playwright and Allure reporting system.
+A simple web automation project that tests the [Pointr Blog](https://www.pointr.tech/blog) using Playwright framework.
 
-## 🚀 Features
+## What This Project Does
 
-- **Playwright**: Modern web automation framework
-- **Allure Reporting**: Detailed test reporting system
-- **Page Object Model**: Maintainable test structure
-- **Multi-browser Support**: Chrome and Firefox support
-- **TypeScript**: Type safety
-- **Parallel Execution**: Parallel test execution
+This project automatically tests the Pointr blog website by:
+- Opening the blog page
+- Getting all blog post titles
+- Opening individual blog posts
+- Analyzing the text content to find the most common words
+- Saving the results to text files
 
-## 📋 Tested Features
+## Project Structure
 
-Basic features tested on the Pointr Blog page:
-
-- ✅ Page opening and loading
-- ✅ Page title verification
-- ✅ Blog title visibility
-- ✅ Page content verification
-- ✅ Screenshot capture
-
-## 🛠️ Installation
-
-1. **Install dependencies:**
-```bash
-npm install
+```
+pointr-blog-tests/
+├── tests/
+│   ├── pages/              # Page Object Model classes
+│   │   ├── HomePage.ts     # Methods for blog listing page
+│   │   └── BlogPage.ts     # Methods for individual blog posts
+│   └── specs/              # Test files
+│       ├── home.spec.ts    # Tests for blog listing page
+│       └── blog-detail.spec.ts  # Tests for individual blog posts
+├── playwright.config.ts    # Playwright configuration
+├── package.json           # Project dependencies and scripts
+├── docker-compose.yml     # Docker configuration
+└── README.md             # This file
 ```
 
-2. **Install Playwright browsers:**
+## How It Works
+
+1. **HomePage.ts**: Contains methods to navigate to the blog and get blog post titles and links
+2. **BlogPage.ts**: Contains methods to open individual blog posts and extract text content
+3. **home.spec.ts**: Tests that get all blog post titles from the main page
+4. **blog-detail.spec.ts**: Tests that open the first 3 blog posts and analyze their text content
+
+## Setup and Running
+
+### Install Dependencies
 ```bash
+npm install
 npm run install-browsers
 ```
 
-3. **Create environment file:**
-```bash
-cp env.example .env
-```
-
-## 🧪 Running Tests
-
-### Basic Commands
-
+### Run Tests
 ```bash
 # Run all tests
 npm test
 
-# Run in headed mode (browser visible)
+# Run tests with browser visible
 npm run test:headed
 
-# Run in UI mode
+# Run tests in UI mode
 npm run test:ui
-
-# Run in debug mode
-npm run test:debug
 ```
 
-### Test Categories
-
+### View Results
 ```bash
-# Only smoke tests
-npm run test:smoke
-
-# Only regression tests
-npm run test:regression
-```
-
-## 📊 Reporting
-
-### Allure Reports
-
-```bash
-# Generate report
+# Open test report
 npm run report
-
-# Open report
-npm run report:open
-
-# Serve report
-npm run report:serve
 ```
 
-## 📁 Project Structure
+## Output Files
 
-```
-├── tests/
-│   └── specs/           # Test files
-│       └── home.spec.ts # Pointr Blog tests
-├── allure-results/      # Allure results
-├── test-results/        # Playwright results
-├── screenshots/         # Screenshots
-├── videos/             # Video recordings
-├── playwright.config.ts # Playwright configuration
-├── package.json
-└── README.md
-```
+The project generates:
+- `top_words_chromium.txt`: Most common words from blog posts (Chrome browser)
+- `top_words_firefox.txt`: Most common words from blog posts (Firefox browser)
+- `playwright-report/`: HTML test reports
+- `test-results/`: Screenshots and videos from test runs
 
-## 🔧 Configuration
+## Technologies Used
 
-### Base URL
-The project is configured for the [Pointr Blog](https://www.pointr.tech/blog) page.
+- **Playwright**: Web automation framework
+- **TypeScript**: Programming language
+- **Page Object Model**: Design pattern for test organization
+- **Docker**: Containerization support
 
-### Browsers
-- Chrome
-- Firefox
+## Test Features
 
-## 🏷️ Test Tags
-
-- `@smoke`: Basic functionality tests
-- `@regression`: Detailed tests
-
-## 🐳 Docker Support
-
-```bash
-# Run tests with Docker
-docker-compose up
-```
-
-## 📝 Next Steps
-
-1. **Expand test scenarios**
-2. **Test more page elements**
-3. **Add API tests**
-4. **Add performance tests**
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Add tests
-4. Create a Pull Request
-
-## 📄 License
-
-This project is licensed under the MIT License.
+- ✅ Navigate to blog page
+- ✅ Extract blog post titles
+- ✅ Open individual blog posts
+- ✅ Analyze text content
+- ✅ Generate word frequency reports
+- ✅ Cross-browser testing (Chrome & Firefox)
