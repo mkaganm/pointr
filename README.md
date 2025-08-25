@@ -24,6 +24,9 @@ pointr/
 - **Mock API Deployment**: Automated deployment of Mock API service (run in Docker)
 - **Jenkins Server**: CI/CD pipelines managed and executed in Docker
 
+![](https://github.com/mkaganm/pointr/blob/master/documents/Screenshot%202025-08-26%20005724.png)
+![](https://github.com/mkaganm/pointr/blob/master/documents/Screenshot%202025-08-26%20005734.png)
+
 ### 2. **Mock API** (`pointr-mock/`)
 
 #### [Mock API files and Document](https://github.com/mkaganm/pointr/tree/master/pointr-mock)
@@ -42,6 +45,13 @@ pointr/
 - **Reporting**: Allure HTML reports (served from Docker)
 - **Execution**: All tests run in Docker containers
 
+![](https://github.com/mkaganm/pointr/blob/master/documents/Screenshot%202025-08-26%20003416.png)
+![](https://github.com/mkaganm/pointr/blob/master/documents/Screenshot%202025-08-26%20003450.png)
+![](https://github.com/mkaganm/pointr/blob/master/documents/Screenshot%202025-08-26%20003501.png)
+![](https://github.com/mkaganm/pointr/blob/master/documents/Screenshot%202025-08-26%20003510.png)
+![](https://github.com/mkaganm/pointr/blob/master/documents/Screenshot%202025-08-26%20003703.png)
+
+
 ### 4. **Blog Tests** (`pointr-blog-tests/`)
 #### [Blog Tests and Document](https://github.com/mkaganm/pointr/tree/master/pointr-blog-tests)
 - **Technology**: Playwright + TypeScript
@@ -49,6 +59,11 @@ pointr/
 - **Features**: Blog post analysis, word frequency
 - **Browsers**: Chrome and Firefox support
 - **Execution**: All tests run in Docker containers
+
+![](https://github.com/mkaganm/pointr/blob/master/documents/Screenshot%202025-08-26%20005327.png)
+![](https://github.com/mkaganm/pointr/blob/master/documents/Screenshot%202025-08-26%20005359.png)
+![](https://github.com/mkaganm/pointr/blob/master/documents/Screenshot%202025-08-26%20005423.png)
+
 
 ## 🐳 Quick Start
 
