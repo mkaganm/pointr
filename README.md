@@ -13,7 +13,7 @@ pointr/
 └── documents/                 # Project documentation
 ```
 
-## �� Components
+## Components
 
 ### 1. **Jenkins CI/CD** (`jenkins/`)
 - **Blog Tests**: Frontend tests (run in Docker)
